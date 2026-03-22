@@ -23,7 +23,9 @@ opengrok-aosp-mcp/
     └── basic.py           # 5 个基础工具
 ```
 
-## 🛠️ 5 个工具说明
+## 🛠️ 7 个工具说明（Milestone 1 + 2）
+
+### 基础搜索工具 (5)
 
 | 工具 | 功能 | 必需参数 | 可选参数 |
 |------|------|----------|----------|
@@ -32,6 +34,13 @@ opengrok-aosp-mcp/
 | `search_full` | 全文搜索 | query | project, path, file_type, limit |
 | `get_file_content` | 获取文件内容 | path | start_line, end_line |
 | `list_projects` | 列出项目 | 无 | 无 |
+
+### AIDL + Binder 工具 (2)
+
+| 工具 | 功能 | 必需参数 | 可选参数 |
+|------|------|----------|----------|
+| `find_aidl_impl` | 分析 AIDL 接口 | interface_name | limit |
+| `trace_binder_chain` | 追踪 Binder 调用链 | interface_name, method_name | limit |
 
 ## 🎯 Kiro 调用示例
 
@@ -72,6 +81,18 @@ Kiro: [调用 get_file_content("frameworks/base/.../ActivityManagerService.java"
 ```
 User: 列出所有项目
 Kiro: [调用 list_projects()]
+```
+
+### 6. find_aidl_impl
+```
+User: 分析 IActivityManager 接口
+Kiro: [调用 find_aidl_impl("IActivityManager")]
+```
+
+### 7. trace_binder_chain
+```
+User: 追踪 IActivityManager.startActivity 的调用链
+Kiro: [调用 trace_binder_chain("IActivityManager", "startActivity")]
 ```
 
 ## 📊 返回格式
@@ -141,7 +162,8 @@ kiro-cli chat
 
 ## 📝 待开发功能
 
-- [ ] Milestone 2: AIDL + Binder 分析工具
+- [x] Milestone 1: 基础框架 + 5 个基础工具
+- [x] Milestone 2: AIDL + Binder 分析工具
 - [ ] Milestone 3: System Service + JNI 工具
 - [ ] Milestone 4-7: 其他 AOSP 专用工具
 - [ ] Milestone 8: 智能分析工具

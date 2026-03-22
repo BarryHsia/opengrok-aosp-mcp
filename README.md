@@ -4,7 +4,9 @@
 
 ## 功能特性
 
-### 5 个基础搜索工具
+### 7 个工具（Milestone 1 + 2）
+
+#### 基础搜索工具 (5)
 
 | 工具 | 功能 | 参数 |
 |------|------|------|
@@ -13,6 +15,13 @@
 | `search_full` | 全文搜索（支持正则） | query, project, path, file_type, limit |
 | `get_file_content` | 获取文件内容（指定行范围） | path, start_line, end_line |
 | `list_projects` | 列出所有 OpenGrok 项目 | 无 |
+
+#### AIDL + Binder 分析工具 (2)
+
+| 工具 | 功能 | 参数 |
+|------|------|------|
+| `find_aidl_impl` | 分析 AIDL 接口（Stub/Proxy/注册） | interface_name, limit |
+| `trace_binder_chain` | 追踪 Binder IPC 调用链（Java→JNI→Native） | interface_name, method_name, limit |
 
 ### Token 优化
 
@@ -192,6 +201,73 @@ User: 列出所有项目
 Kiro: [调用 list_projects()]
 ```
 
+### 6. find_aidl_impl - 分析 AIDL 接口
+
+**用途**：分析 AIDL 接口的完整实现（接口定义、Stub、Proxy、服务注册）
+
+**参数**：
+- `interface_name` (必需): AIDL 接口名，如 "IActivityManager"
+- `limit` (可选): 每个类型的最大结果数，默认 10
+
+**示例**：
+```
+User: 分析 IActivityManager 接口
+Kiro: [调用 find_aidl_impl("IActivityManager")]
+
+User: 查看 IWindowManager 的实现
+Kiro: [调用 find_aidl_impl("IWindowManager")]
+```
+
+**返回格式**：
+```json
+{
+  "interface": {
+    "path": "f/b/core/java/android/app/IActivityManager.aidl",
+    "line": 1,
+    "snippet": "interface IActivityManager {",
+    "url": "http://localhost:8080/xref/..."
+  },
+  "stub": [
+    {
+      "path": "f/b/core/java/android/app/IActivityManager.java",
+      "line": 123,
+      "snippet": "public static abstract class Stub extends Binder",
+      "url": "http://localhost:8080/xref/..."
+    }
+  ],
+  "proxy": [...],
+  "registration": [...]
+}
+```
+
+### 7. trace_binder_chain - 追踪 Binder 调用链
+
+**用途**：追踪 Binder IPC 调用链，从 Java 接口到 Native 实现
+
+**参数**：
+- `interface_name` (必需): 接口名，如 "IActivityManager"
+- `method_name` (必需): 方法名，如 "startActivity"
+- `limit` (可选): 每层的最大结果数，默认 10
+
+**示例**：
+```
+User: 追踪 IActivityManager.startActivity 的调用链
+Kiro: [调用 trace_binder_chain("IActivityManager", "startActivity")]
+
+User: 查看 IWindowManager.addWindow 的实现路径
+Kiro: [调用 trace_binder_chain("IWindowManager", "addWindow")]
+```
+
+**返回格式**：
+```json
+{
+  "java_interface": [...],  // Java 接口定义
+  "java_impl": [...],       // Java 实现（Stub）
+  "jni_bridge": [...],      // JNI 桥接
+  "native_impl": [...]      // Native 实现
+}
+```
+
 ## 典型使用场景
 
 ### 场景 1：理解某个类的实现
@@ -225,6 +301,28 @@ Kiro 会：
 1. search_full("checkPermission") - 全文搜索
 2. search_definitions("checkPermission") - 找到具体实现
 3. get_file_content(...) - 查看实现细节
+```
+
+### 场景 4：分析 AIDL 接口
+
+```
+User: IActivityManager 接口是如何实现的？
+
+Kiro 会：
+1. find_aidl_impl("IActivityManager") - 分析接口、Stub、Proxy
+2. 查看服务注册点
+3. 理解 Binder 通信机制
+```
+
+### 场景 5：追踪 Binder 调用链
+
+```
+User: startActivity 是如何通过 Binder 调用的？
+
+Kiro 会：
+1. trace_binder_chain("IActivityManager", "startActivity")
+2. 展示 Java → JNI → Native 的完整调用路径
+3. 帮助理解跨进程通信流程
 ```
 
 ## 项目结构
@@ -271,7 +369,7 @@ ps aux | grep opengrok
 ## 开发路线
 
 - [x] Milestone 1: 基础框架 + 5 个基础工具
-- [ ] Milestone 2: AIDL + Binder 分析工具
+- [x] Milestone 2: AIDL + Binder 分析工具
 - [ ] Milestone 3: System Service + JNI 工具
 - [ ] Milestone 4-7: 其他 AOSP 专用工具
 - [ ] Milestone 8: 智能分析工具

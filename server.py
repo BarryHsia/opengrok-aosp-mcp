@@ -6,7 +6,7 @@ from typing import Optional
 from mcp.server.fastmcp import FastMCP
 
 from core import OpenGrokClient, QueryCache, TokenOptimizer
-from tools import BasicTools
+from tools import BasicTools, AidlBinderTools
 
 
 # Load configuration
@@ -66,6 +66,7 @@ optimizer = TokenOptimizer(config)
 
 # Initialize tools
 basic_tools = BasicTools(client, cache, optimizer)
+aidl_binder_tools = AidlBinderTools(client, cache, optimizer)
 
 
 # Register MCP tools
@@ -119,6 +120,26 @@ def get_file_content(
 def list_projects():
     """List all available OpenGrok projects."""
     return basic_tools.list_projects()
+
+
+# AIDL and Binder tools
+@mcp.tool()
+def find_aidl_impl(
+    interface_name: str,
+    limit: int = 10,
+):
+    """Analyze AIDL interface (Stub/Proxy/registration)."""
+    return aidl_binder_tools.find_aidl_impl(interface_name, limit)
+
+
+@mcp.tool()
+def trace_binder_chain(
+    interface_name: str,
+    method_name: str,
+    limit: int = 10,
+):
+    """Trace Binder IPC call chain (Java -> JNI -> Native)."""
+    return aidl_binder_tools.trace_binder_chain(interface_name, method_name, limit)
 
 
 if __name__ == "__main__":
