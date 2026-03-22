@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-### 16 个工具（完整实现）
+### 18 个工具（完整实现）
 
 #### 基础搜索工具 (5)
 
@@ -41,6 +41,13 @@
 | `find_resource_overlay` | 查找资源和 RRO | resource_name, limit |
 | `trace_init_service` | 追踪 Init 服务 | service_name, limit |
 | `analyze_build_module` | 分析构建模块 | module_name, limit |
+
+#### Intelligent 工具 (2)
+
+| 工具 | 功能 | 参数 |
+|------|------|------|
+| `explain_code_flow` | 智能代码流程解释 | symbol, limit |
+| `find_similar_patterns` | 查找相似代码模式 | pattern, file_type, limit |
 
 ### Token 优化
 
@@ -503,9 +510,9 @@ ps aux | grep opengrok
 - [x] Milestone 2: AIDL + Binder 分析工具
 - [x] Milestone 3: System Service + JNI 工具
 - [x] Milestone 4-7: Advanced AOSP 工具（HAL、Broadcast、SELinux、Resource、Init、Build）
-- [ ] Milestone 8: 智能分析工具（可选）
+- [x] Milestone 8: 智能分析工具
 
-**项目已完成核心功能，共 16 个工具！**
+**🎉 项目已完成所有功能，共 18 个工具！**
 
 ## 许可证
 

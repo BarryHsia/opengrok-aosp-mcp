@@ -23,7 +23,7 @@ opengrok-aosp-mcp/
     └── basic.py           # 5 个基础工具
 ```
 
-## 🛠️ 16 个工具说明（完整实现）
+## 🛠️ 18 个工具说明（完整实现）
 
 ### 基础搜索工具 (5)
 | 工具 | 功能 | 必需参数 | 可选参数 |
@@ -56,6 +56,12 @@ opengrok-aosp-mcp/
 | `find_resource_overlay` | 查找资源和 RRO | resource_name | limit |
 | `trace_init_service` | 追踪 Init 服务 | service_name | limit |
 | `analyze_build_module` | 分析构建模块 | module_name | limit |
+
+### Intelligent 工具 (2)
+| 工具 | 功能 | 必需参数 | 可选参数 |
+|------|------|----------|----------|
+| `explain_code_flow` | 智能代码流程解释 | symbol | limit |
+| `find_similar_patterns` | 查找相似代码模式 | pattern | file_type, limit |
 
 ## 🎯 Kiro 调用示例
 
@@ -193,15 +199,15 @@ kiro-cli chat
 查找 ActivityManagerService 的定义
 ```
 
-## 📝 待开发功能
+## 📝 开发完成
 
 - [x] Milestone 1: 基础框架 + 5 个基础工具
 - [x] Milestone 2: AIDL + Binder 分析工具
 - [x] Milestone 3: System Service + JNI 工具
 - [x] Milestone 4-7: Advanced AOSP 工具
-- [ ] Milestone 8: 智能分析工具（可选）
+- [x] Milestone 8: 智能分析工具
 
-**✅ 核心功能已完成，共 16 个工具！**
+**🎉 所有功能已完成，共 18 个工具！**
 
 ## 🔧 优化点
 

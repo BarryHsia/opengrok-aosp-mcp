@@ -6,7 +6,13 @@ from typing import Optional
 from mcp.server.fastmcp import FastMCP
 
 from core import OpenGrokClient, QueryCache, TokenOptimizer
-from tools import BasicTools, AidlBinderTools, SystemServiceJniTools, AdvancedAospTools
+from tools import (
+    BasicTools,
+    AidlBinderTools,
+    SystemServiceJniTools,
+    AdvancedAospTools,
+    IntelligentTools
+)
 
 
 # Load configuration
@@ -69,6 +75,7 @@ basic_tools = BasicTools(client, cache, optimizer)
 aidl_binder_tools = AidlBinderTools(client, cache, optimizer)
 system_service_jni_tools = SystemServiceJniTools(client, cache, optimizer)
 advanced_aosp_tools = AdvancedAospTools(client, cache, optimizer)
+intelligent_tools = IntelligentTools(client, cache, optimizer)
 
 
 # Register MCP tools
@@ -226,6 +233,26 @@ def analyze_build_module(
 ):
     """Analyze build system module (Android.bp/mk)."""
     return advanced_aosp_tools.analyze_build_module(module_name, limit)
+
+
+# Intelligent analysis tools
+@mcp.tool()
+def explain_code_flow(
+    symbol: str,
+    limit: int = 5,
+):
+    """Smart code flow explanation (combines multiple tools)."""
+    return intelligent_tools.explain_code_flow(symbol, limit)
+
+
+@mcp.tool()
+def find_similar_patterns(
+    pattern: str,
+    file_type: Optional[str] = None,
+    limit: int = 10,
+):
+    """Find similar code patterns (regex-based)."""
+    return intelligent_tools.find_similar_patterns(pattern, file_type, limit)
 
 
 if __name__ == "__main__":

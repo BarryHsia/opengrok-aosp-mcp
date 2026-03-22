@@ -13,7 +13,7 @@
 - `config.example.json` - 配置模板
 - `pyproject.toml` - Python 项目配置和依赖
 
-## 🐍 Python 代码 (8)
+## 🐍 Python 代码 (11)
 
 ### 入口和服务器
 - `server.py` - MCP 服务器入口点
@@ -27,10 +27,19 @@
 ### 工具实现 (tools/)
 - `tools/__init__.py` - 工具导出
 - `tools/basic.py` - 5 个基础搜索工具
+- `tools/aidl_binder.py` - 2 个 AIDL + Binder 工具
+- `tools/system_service_jni.py` - 3 个 System Service + JNI 工具
+- `tools/advanced_aosp.py` - 6 个 Advanced AOSP 工具
+- `tools/intelligent.py` - 2 个智能分析工具
 
 ### 测试和演示
 - `test_connection.py` - 测试 OpenGrok 连接
-- `test_all.py` - 快速测试所有工具
+- `test_all.py` - 快速测试基础工具
+- `test_milestone2.py` - 测试 AIDL + Binder 工具
+- `test_milestone3.py` - 测试 System Service + JNI 工具
+- `test_milestone4_7.py` - 测试 Advanced AOSP 工具
+- `test_milestone8.py` - 测试智能分析工具
+- `test_all_tools.py` - 测试所有 18 个工具
 - `demo.py` - 完整演示和使用说明
 
 ## 🔧 脚本文件 (1)
@@ -39,11 +48,21 @@
 
 ## 📊 统计
 
-- 总文件数: 16
-- Python 代码: 8 个文件
+- 总文件数: 25+
+- Python 代码: 11 个文件（5 个工具模块）
 - 文档: 4 个文件
 - 配置: 3 个文件
 - 脚本: 1 个文件
+- 测试: 7 个测试脚本
+
+## 🎯 工具统计
+
+- 基础搜索: 5 个
+- AIDL + Binder: 2 个
+- System Service + JNI: 3 个
+- Advanced AOSP: 6 个
+- Intelligent: 2 个
+- **总计: 18 个工具**
 
 ## 🗂️ 目录结构
 
