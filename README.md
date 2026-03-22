@@ -1,108 +1,62 @@
 # OpenGrok AOSP MCP Server
 
-A specialized Model Context Protocol (MCP) server for Android Open Source Project (AOSP) development, providing intelligent code navigation and analysis through OpenGrok.
+为 AOSP 开发设计的 MCP 服务器，通过 OpenGrok 提供智能代码导航和分析。
 
-## Features
+## 功能特性
 
-### Basic Code Search (5 tools)
-- **search_definitions** - Find symbol definitions (functions, classes, methods)
-- **search_references** - Find symbol references/usage points
-- **search_full** - Full-text search with regex support
-- **get_file_content** - Retrieve file content with line range support
-- **list_projects** - List all available OpenGrok projects
+### 5 个基础搜索工具
 
-### AOSP-Specific Tools (13 tools)
-- **trace_binder_chain** - Trace Binder IPC call chains across Java/JNI/Native layers
-- **find_aidl_impl** - Analyze AIDL interfaces (Stub/Proxy/registration)
-- **analyze_system_service** - System Service lifecycle analysis
-- **trace_permission** - Permission check path tracing
-- **find_hal_interface** - HAL interface definition and usage (HIDL/AIDL)
-- **find_jni_bridge** - Java-Native bridging analysis
-- **analyze_build_module** - Build system module analysis (Android.bp/mk)
-- **trace_broadcast** - Broadcast flow tracing (senders/receivers)
-- **search_selinux_policy** - SELinux policy search
-- **find_resource_overlay** - Framework resource and RRO analysis
-- **trace_init_service** - Init process service tracing
-- **find_hidl_passthrough** - HIDL Passthrough mode analysis
-- **analyze_vintf_manifest** - VINTF manifest analysis
+| 工具 | 功能 | 参数 |
+|------|------|------|
+| `search_definitions` | 查找符号定义（函数、类、方法） | symbol, project, path, file_type, limit |
+| `search_references` | 查找符号引用/使用点 | symbol, project, path, file_type, limit |
+| `search_full` | 全文搜索（支持正则） | query, project, path, file_type, limit |
+| `get_file_content` | 获取文件内容（指定行范围） | path, start_line, end_line |
+| `list_projects` | 列出所有 OpenGrok 项目 | 无 |
 
-### Intelligent Tools (2 tools)
-- **explain_code_flow** - Smart code flow explanation (combines multiple tools)
-- **find_similar_patterns** - Find similar code patterns (AST-based)
+### Token 优化
 
-## Token Optimization
+- 路径缩写：`frameworks/base` → `f/b`
+- 代码片段限制 5 行
+- 24 小时缓存
+- 默认返回 10 条结果
 
-This server is designed to minimize token consumption:
-- Concise tool descriptions (<50 words)
-- Abbreviated return paths (e.g., `f/b/services/...`)
-- Limited result sets (default 10, max 50)
-- Smart caching (24h for AOSP code)
-- Snippet-only responses with clickable URLs
+## 快速开始
 
-## Installation
-
-### Prerequisites
-- Python 3.10+
-- OpenGrok server with API access
-- `uv` package manager (recommended)
-
-### Quick Install
+### 1. 安装
 
 ```bash
-# Clone repository
-git clone https://github.com/your-org/opengrok-aosp-mcp.git
+git clone <repo-url> opengrok-aosp-mcp
 cd opengrok-aosp-mcp
-
-# Run install script
 ./install.sh
 ```
 
-The script will:
-1. Check Python version
-2. Install `uv` if needed
-3. Create virtual environment and install dependencies
-4. Generate config file
-5. Output Kiro configuration example
+### 2. 配置
 
-### Manual Install
+编辑 `config.json`：
+
+```json
+{
+  "opengrok": {
+    "base_url": "http://localhost:8080",
+    "token": null
+  }
+}
+```
+
+### 3. 测试
 
 ```bash
-# Install dependencies
-uv sync
+# 测试连接
+uv run python test_connection.py
 
-# Configure OpenGrok
-cp config.example.json config.json
-# Edit config.json with your OpenGrok URL and token
-
-# Test run
-uv run python server.py
+# 测试所有工具
+uv run python test_all.py
 ```
 
-## Configuration
+### 4. 配置 Kiro CLI
 
-### OpenGrok Setup
-
-Your OpenGrok server needs API token authentication enabled. Add to read-only config:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<java version="1.8.0_121" class="java.beans.XMLDecoder">
-  <object class="org.opengrok.indexer.configuration.Configuration">
-    <void property="authenticationTokens">
-      <void method="add">
-        <string>your-token</string>
-      </void>
-    </void>
-    <void property="allowInsecureTokens">
-      <boolean>true</boolean>
-    </void>
-  </object>
-</java>
-```
-
-### Kiro CLI Configuration
-
-Add to `~/.kiro/settings/mcp.json` (global) or `.kiro/settings/mcp.json` (workspace):
+编辑 `~/.kiro/settings/mcp.json`：
 
 ```json
 {
@@ -115,134 +69,219 @@ Add to `~/.kiro/settings/mcp.json` (global) or `.kiro/settings/mcp.json` (worksp
         "run",
         "python",
         "server.py"
-      ],
-      "env": {
-        "OPENGROK_BASE_URL": "http://your-opengrok:8080/source",
-        "OPENGROK_TOKEN": "your-token-here"
-      }
+      ]
     }
   }
 }
 ```
 
-### Trust Tools (Optional)
-
-To avoid confirmation prompts in Kiro:
+### 5. 使用
 
 ```bash
-# In Kiro chat
+kiro-cli chat
+
+# 在 Kiro 中
 /tools trust-all
 
-# Or trust specific tools
-/tools trust search_definitions search_references
+# 测试工具
+搜索 ActivityManagerService 的定义
+查找 startActivity 的引用
 ```
 
-## Usage Examples
+## 工具使用示例
 
-### Basic Search
+### 1. search_definitions - 查找符号定义
+
+**用途**：查找函数、类、方法的定义位置
+
+**参数**：
+- `symbol` (必需): 符号名称，如 "ActivityManagerService"
+- `project` (可选): 项目过滤
+- `path` (可选): 路径过滤，如 "frameworks/base"
+- `file_type` (可选): 文件类型，如 "java", "cpp"
+- `limit` (可选): 最大结果数，默认 10
+
+**示例**：
 ```
-User: Find the definition of ActivityManagerService
-Kiro: [calls search_definitions("ActivityManagerService")]
-```
+User: 查找 ActivityManagerService 的定义
+Kiro: [调用 search_definitions("ActivityManagerService")]
 
-### AOSP-Specific Analysis
-```
-User: Trace the Binder call chain from IActivityManager.startActivity
-Kiro: [calls trace_binder_chain("IActivityManager", "startActivity")]
-
-User: Where is the CAMERA permission checked?
-Kiro: [calls trace_permission("android.permission.CAMERA")]
-
-User: Find the JNI bridge for android.os.Process
-Kiro: [calls find_jni_bridge("android.os.Process")]
-```
-
-## Development Roadmap
-
-- [x] **Milestone 1**: Basic framework + 5 basic search tools
-- [ ] **Milestone 2**: AIDL + Binder analysis tools
-- [ ] **Milestone 3**: System Service + JNI tools
-- [ ] **Milestone 4-7**: Remaining AOSP tools
-- [ ] **Milestone 8**: Intelligent analysis tools
-
-## Uninstall
-
-```bash
-# 1. Remove from Kiro config (~/.kiro/settings/mcp.json)
-# 2. Delete project directory
-rm -rf /path/to/opengrok-aosp-mcp
+User: 在 frameworks/base 中查找 PowerManager 的定义
+Kiro: [调用 search_definitions("PowerManager", path="frameworks/base")]
 ```
 
-## Architecture
+**返回格式**：
+```json
+[
+  {
+    "path": "f/b/services/core/java/com/android/server/am/ActivityManagerService.java",
+    "line": 123,
+    "snippet": "public class ActivityManagerService extends IActivityManager.Stub",
+    "url": "http://localhost:8080/xref/frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java#123"
+  }
+]
+```
 
-### Token Optimization Strategy
-1. **Concise descriptions**: Tool descriptions <50 words
-2. **Path abbreviation**: `frameworks/base/...` → `f/b/...`
-3. **Snippet-only**: Return 5 key lines + clickable URL
-4. **Smart caching**: 24h cache for AOSP code (slow-changing)
-5. **Result limits**: Default 10, max 50 results
+### 2. search_references - 查找符号引用
 
-### Project Structure
+**用途**：查找符号在哪些地方被使用
+
+**参数**：同 search_definitions
+
+**示例**：
+```
+User: 查找 startActivity 在哪里被调用
+Kiro: [调用 search_references("startActivity")]
+
+User: 查找 PowerManager.WakeLock 的所有使用
+Kiro: [调用 search_references("WakeLock", path="frameworks")]
+```
+
+### 3. search_full - 全文搜索
+
+**用途**：搜索包含特定文本的代码（支持正则表达式）
+
+**参数**：
+- `query` (必需): 搜索文本或正则表达式
+- 其他参数同上
+
+**示例**：
+```
+User: 搜索包含 "Binder transaction" 的代码
+Kiro: [调用 search_full("Binder transaction")]
+
+User: 搜索 TODO 注释
+Kiro: [调用 search_full("TODO:")]
+```
+
+### 4. get_file_content - 获取文件内容
+
+**用途**：读取指定文件的内容（带行号）
+
+**参数**：
+- `path` (必需): 文件路径
+- `start_line` (可选): 起始行，默认 1
+- `end_line` (可选): 结束行，默认 50
+
+**示例**：
+```
+User: 查看 ActivityManagerService.java 的前 100 行
+Kiro: [调用 get_file_content("frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java", start_line=1, end_line=100)]
+```
+
+**返回格式**：
+```json
+{
+  "path": "f/b/services/core/java/com/android/server/am/ActivityManagerService.java",
+  "start_line": 1,
+  "end_line": 100,
+  "total_lines": 5234,
+  "text": "1: package com.android.server.am;\n2: \n3: import android.app.ActivityManager;\n..."
+}
+```
+
+### 5. list_projects - 列出项目
+
+**用途**：列出 OpenGrok 中所有可用的项目
+
+**参数**：无
+
+**示例**：
+```
+User: 列出所有项目
+Kiro: [调用 list_projects()]
+```
+
+## 典型使用场景
+
+### 场景 1：理解某个类的实现
+
+```
+User: ActivityManagerService 是如何实现的？
+
+Kiro 会：
+1. search_definitions("ActivityManagerService") - 找到定义
+2. get_file_content(...) - 查看类的主要代码
+3. search_references("ActivityManagerService") - 查看哪里使用了它
+```
+
+### 场景 2：追踪方法调用链
+
+```
+User: startActivity 方法的调用链是什么？
+
+Kiro 会：
+1. search_definitions("startActivity") - 找到定义
+2. search_references("startActivity") - 找到所有调用点
+3. 逐层追踪调用关系
+```
+
+### 场景 3：查找特定功能的实现
+
+```
+User: 权限检查是如何实现的？
+
+Kiro 会：
+1. search_full("checkPermission") - 全文搜索
+2. search_definitions("checkPermission") - 找到具体实现
+3. get_file_content(...) - 查看实现细节
+```
+
+## 项目结构
+
 ```
 opengrok-aosp-mcp/
-├── README.md                    # This file
-├── pyproject.toml              # Dependencies
-├── server.py                   # MCP entry point
-├── config.example.json         # Config template
-├── install.sh                  # Install script
+├── README.md              # 本文件
+├── config.json            # 配置文件
+├── server.py              # MCP 服务器入口
+├── install.sh             # 安装脚本
+├── test_all.py            # 测试所有工具
+├── test_connection.py     # 测试 OpenGrok 连接
 ├── core/
-│   ├── opengrok_client.py     # OpenGrok API wrapper
-│   ├── cache.py               # Query cache
-│   └── token_optimizer.py     # Token optimization
-├── tools/
-│   ├── basic.py               # 5 basic search tools
-│   ├── aidl.py                # AIDL tools
-│   ├── binder.py              # Binder tools
-│   └── ...                    # Other AOSP tools
-└── tests/
-    └── test_basic.py
+│   ├── opengrok_client.py # OpenGrok API 客户端
+│   ├── cache.py           # 查询缓存
+│   └── token_optimizer.py # Token 优化
+└── tools/
+    └── basic.py           # 5 个基础工具实现
 ```
 
-## Common AOSP Development Scenarios
+## 故障排查
 
-### Scenario 1: Trace Binder Call Chain
-**Problem**: "How does ActivityManagerService.startActivity reach Zygote?"
-**Solution**: `trace_binder_chain("IActivityManager", "startActivity")`
+### OpenGrok 连接失败
 
-### Scenario 2: Find AIDL Implementation
-**Problem**: "Where is IWindowManager.aidl implemented?"
-**Solution**: `find_aidl_impl("IWindowManager")`
+```bash
+# 测试连接
+curl http://localhost:8080/api/v1/search?full=test&maxresults=1
 
-### Scenario 3: System Service Startup
-**Problem**: "When does PowerManagerService start?"
-**Solution**: `analyze_system_service("power")`
+# 检查 OpenGrok 是否运行
+ps aux | grep opengrok
+```
 
-### Scenario 4: Permission Check Path
-**Problem**: "Where is CAMERA permission enforced?"
-**Solution**: `trace_permission("android.permission.CAMERA")`
+### 搜索结果为空
 
-### Scenario 5: HAL Interface
-**Problem**: "Where is Camera HAL defined?"
-**Solution**: `find_hal_interface("camera", "aidl")`
+- 确认 OpenGrok 已索引源码
+- 检查搜索的符号是否存在
+- 尝试使用 `search_full` 进行全文搜索
 
-### Scenario 6: JNI Bridge
-**Problem**: "How does android.os.Process call native code?"
-**Solution**: `find_jni_bridge("android.os.Process")`
+### 认证错误 (401)
 
-## Contributing
+- 在 `config.json` 中配置 `token`
+- 或在 OpenGrok 中禁用认证
 
-Contributions welcome! Please:
-1. Follow existing code style
-2. Add tests for new tools
-3. Update README with new features
-4. Keep token optimization in mind
+## 开发路线
 
-## License
+- [x] Milestone 1: 基础框架 + 5 个基础工具
+- [ ] Milestone 2: AIDL + Binder 分析工具
+- [ ] Milestone 3: System Service + JNI 工具
+- [ ] Milestone 4-7: 其他 AOSP 专用工具
+- [ ] Milestone 8: 智能分析工具
+
+## 许可证
 
 Apache 2.0
 
-## Credits
+## 致谢
 
-- Based on [opengrok-mcp](https://github.com/SleepyDog053/opengrok-mcp) by SleepyDog053
-- Built with [FastMCP](https://github.com/jlowin/fastmcp)
-- Designed for [Kiro CLI](https://kiro.dev)
+- 基于 [opengrok-mcp](https://github.com/SleepyDog053/opengrok-mcp)
+- 使用 [FastMCP](https://github.com/jlowin/fastmcp) 框架
+- 为 [Kiro CLI](https://kiro.dev) 设计

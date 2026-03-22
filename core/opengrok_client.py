@@ -15,7 +15,7 @@ class OpenGrokClient:
     
     def _headers(self) -> Dict[str, str]:
         """Build request headers."""
-        headers = {}
+        headers = {"Accept": "application/json"}
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         return headers
@@ -137,15 +137,20 @@ class OpenGrokClient:
     
     def list_projects(self) -> List[str]:
         """List all available projects."""
-        with httpx.Client(timeout=self.timeout) as client:
-            resp = client.get(
-                self._url("/api/v1/projects"),
-                headers=self._headers(),
-            )
-            resp.raise_for_status()
-            data = resp.json()
-        
-        return [str(p) for p in data]
+        try:
+            with httpx.Client(timeout=self.timeout) as client:
+                resp = client.get(
+                    self._url("/api/v1/projects"),
+                    headers=self._headers(),
+                )
+                resp.raise_for_status()
+                data = resp.json()
+            
+            return [str(p) for p in data]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 401:
+                return ["[Authentication required - configure token in config.json]"]
+            raise
     
     def _parse_line_number(self, line_num: Any) -> Optional[int]:
         """Parse line number from various formats."""

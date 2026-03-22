@@ -34,9 +34,10 @@ class BasicTools:
         """
         # Check cache
         cache_key = ("def", {"symbol": symbol, "project": project, "path": path, "file_type": file_type})
-        cached = self.cache.get("search", cache_key)
-        if cached:
-            return cached[:limit]
+        if self.cache:
+            cached = self.cache.get("search", cache_key)
+            if cached:
+                return cached[:limit]
         
         # Query OpenGrok
         results = self.client.search(
@@ -50,7 +51,8 @@ class BasicTools:
         
         # Optimize and cache
         optimized = self.optimizer.optimize_results(results)
-        self.cache.set("search", cache_key, optimized)
+        if self.cache:
+            self.cache.set("search", cache_key, optimized)
         
         return optimized[:limit]
     
@@ -76,9 +78,10 @@ class BasicTools:
             List of {path, line, snippet, url}
         """
         cache_key = ("symbol", {"symbol": symbol, "project": project, "path": path, "file_type": file_type})
-        cached = self.cache.get("search", cache_key)
-        if cached:
-            return cached[:limit]
+        if self.cache:
+            cached = self.cache.get("search", cache_key)
+            if cached:
+                return cached[:limit]
         
         results = self.client.search(
             search_type="symbol",
@@ -90,7 +93,8 @@ class BasicTools:
         )
         
         optimized = self.optimizer.optimize_results(results)
-        self.cache.set("search", cache_key, optimized)
+        if self.cache:
+            self.cache.set("search", cache_key, optimized)
         
         return optimized[:limit]
     
@@ -116,9 +120,10 @@ class BasicTools:
             List of {path, line, snippet, url}
         """
         cache_key = ("full", {"query": query, "project": project, "path": path, "file_type": file_type})
-        cached = self.cache.get("search", cache_key)
-        if cached:
-            return cached[:limit]
+        if self.cache:
+            cached = self.cache.get("search", cache_key)
+            if cached:
+                return cached[:limit]
         
         results = self.client.search(
             search_type="full",
@@ -130,7 +135,8 @@ class BasicTools:
         )
         
         optimized = self.optimizer.optimize_results(results)
-        self.cache.set("search", cache_key, optimized)
+        if self.cache:
+            self.cache.set("search", cache_key, optimized)
         
         return optimized[:limit]
     
@@ -157,16 +163,18 @@ class BasicTools:
             end_line = start_line + max_lines
         
         cache_key = ("file", {"path": path, "start": start_line, "end": end_line})
-        cached = self.cache.get("content", cache_key)
-        if cached:
-            return cached
+        if self.cache:
+            cached = self.cache.get("content", cache_key)
+            if cached:
+                return cached
         
         result = self.client.get_file_content(path, start_line, end_line)
         
         # Optimize path
         result["path"] = self.optimizer.abbreviate_path(result["path"])
         
-        self.cache.set("content", cache_key, result)
+        if self.cache:
+            self.cache.set("content", cache_key, result)
         return result
     
     def list_projects(self) -> List[str]:
@@ -176,11 +184,13 @@ class BasicTools:
         Returns:
             List of project names
         """
-        cached = self.cache.get("projects", {})
-        if cached:
-            return cached
+        if self.cache:
+            cached = self.cache.get("projects", {})
+            if cached:
+                return cached
         
         projects = self.client.list_projects()
-        self.cache.set("projects", {}, projects)
+        if self.cache:
+            self.cache.set("projects", {}, projects)
         
         return projects
