@@ -23,10 +23,9 @@ opengrok-aosp-mcp/
     └── basic.py           # 5 个基础工具
 ```
 
-## 🛠️ 10 个工具说明（Milestone 1 + 2 + 3）
+## 🛠️ 16 个工具说明（完整实现）
 
 ### 基础搜索工具 (5)
-
 | 工具 | 功能 | 必需参数 | 可选参数 |
 |------|------|----------|----------|
 | `search_definitions` | 查找符号定义 | symbol | project, path, file_type, limit |
@@ -36,19 +35,27 @@ opengrok-aosp-mcp/
 | `list_projects` | 列出项目 | 无 | 无 |
 
 ### AIDL + Binder 工具 (2)
-
 | 工具 | 功能 | 必需参数 | 可选参数 |
 |------|------|----------|----------|
 | `find_aidl_impl` | 分析 AIDL 接口 | interface_name | limit |
 | `trace_binder_chain` | 追踪 Binder 调用链 | interface_name, method_name | limit |
 
 ### System Service + JNI 工具 (3)
-
 | 工具 | 功能 | 必需参数 | 可选参数 |
 |------|------|----------|----------|
 | `analyze_system_service` | 分析系统服务 | service_name | limit |
 | `find_jni_bridge` | 查找 JNI 桥接 | java_class | limit |
 | `trace_permission` | 追踪权限检查 | permission | limit |
+
+### Advanced AOSP 工具 (6)
+| 工具 | 功能 | 必需参数 | 可选参数 |
+|------|------|----------|----------|
+| `find_hal_interface` | 查找 HAL 接口 | hal_name | hal_type, limit |
+| `trace_broadcast` | 追踪广播流程 | action | limit |
+| `search_selinux_policy` | 搜索 SELinux 策略 | query | limit |
+| `find_resource_overlay` | 查找资源和 RRO | resource_name | limit |
+| `trace_init_service` | 追踪 Init 服务 | service_name | limit |
+| `analyze_build_module` | 分析构建模块 | module_name | limit |
 
 ## 🎯 Kiro 调用示例
 
@@ -191,8 +198,10 @@ kiro-cli chat
 - [x] Milestone 1: 基础框架 + 5 个基础工具
 - [x] Milestone 2: AIDL + Binder 分析工具
 - [x] Milestone 3: System Service + JNI 工具
-- [ ] Milestone 4-7: 其他 AOSP 专用工具
-- [ ] Milestone 8: 智能分析工具
+- [x] Milestone 4-7: Advanced AOSP 工具
+- [ ] Milestone 8: 智能分析工具（可选）
+
+**✅ 核心功能已完成，共 16 个工具！**
 
 ## 🔧 优化点
 

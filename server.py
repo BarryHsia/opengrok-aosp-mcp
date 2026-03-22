@@ -6,7 +6,7 @@ from typing import Optional
 from mcp.server.fastmcp import FastMCP
 
 from core import OpenGrokClient, QueryCache, TokenOptimizer
-from tools import BasicTools, AidlBinderTools, SystemServiceJniTools
+from tools import BasicTools, AidlBinderTools, SystemServiceJniTools, AdvancedAospTools
 
 
 # Load configuration
@@ -68,6 +68,7 @@ optimizer = TokenOptimizer(config)
 basic_tools = BasicTools(client, cache, optimizer)
 aidl_binder_tools = AidlBinderTools(client, cache, optimizer)
 system_service_jni_tools = SystemServiceJniTools(client, cache, optimizer)
+advanced_aosp_tools = AdvancedAospTools(client, cache, optimizer)
 
 
 # Register MCP tools
@@ -169,6 +170,62 @@ def trace_permission(
 ):
     """Trace permission check path (definition/check/enforcement)."""
     return system_service_jni_tools.trace_permission(permission, limit)
+
+
+# Advanced AOSP tools
+@mcp.tool()
+def find_hal_interface(
+    hal_name: str,
+    hal_type: str = "aidl",
+    limit: int = 10,
+):
+    """Find HAL interface definition and implementation."""
+    return advanced_aosp_tools.find_hal_interface(hal_name, hal_type, limit)
+
+
+@mcp.tool()
+def trace_broadcast(
+    action: str,
+    limit: int = 10,
+):
+    """Trace broadcast flow (senders and receivers)."""
+    return advanced_aosp_tools.trace_broadcast(action, limit)
+
+
+@mcp.tool()
+def search_selinux_policy(
+    query: str,
+    limit: int = 10,
+):
+    """Search SELinux policy files."""
+    return advanced_aosp_tools.search_selinux_policy(query, limit)
+
+
+@mcp.tool()
+def find_resource_overlay(
+    resource_name: str,
+    limit: int = 10,
+):
+    """Find framework resource and RRO (Runtime Resource Overlay)."""
+    return advanced_aosp_tools.find_resource_overlay(resource_name, limit)
+
+
+@mcp.tool()
+def trace_init_service(
+    service_name: str,
+    limit: int = 10,
+):
+    """Trace init process service (init.rc and service code)."""
+    return advanced_aosp_tools.trace_init_service(service_name, limit)
+
+
+@mcp.tool()
+def analyze_build_module(
+    module_name: str,
+    limit: int = 10,
+):
+    """Analyze build system module (Android.bp/mk)."""
+    return advanced_aosp_tools.analyze_build_module(module_name, limit)
 
 
 if __name__ == "__main__":

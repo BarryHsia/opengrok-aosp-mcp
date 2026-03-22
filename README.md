@@ -4,32 +4,43 @@
 
 ## 功能特性
 
-### 10 个工具（Milestone 1 + 2 + 3）
+### 16 个工具（完整实现）
 
 #### 基础搜索工具 (5)
 
 | 工具 | 功能 | 参数 |
 |------|------|------|
-| `search_definitions` | 查找符号定义（函数、类、方法） | symbol, project, path, file_type, limit |
-| `search_references` | 查找符号引用/使用点 | symbol, project, path, file_type, limit |
-| `search_full` | 全文搜索（支持正则） | query, project, path, file_type, limit |
-| `get_file_content` | 获取文件内容（指定行范围） | path, start_line, end_line |
-| `list_projects` | 列出所有 OpenGrok 项目 | 无 |
+| `search_definitions` | 查找符号定义 | symbol, project, path, file_type, limit |
+| `search_references` | 查找符号引用 | symbol, project, path, file_type, limit |
+| `search_full` | 全文搜索 | query, project, path, file_type, limit |
+| `get_file_content` | 获取文件内容 | path, start_line, end_line |
+| `list_projects` | 列出项目 | 无 |
 
-#### AIDL + Binder 分析工具 (2)
+#### AIDL + Binder 工具 (2)
 
 | 工具 | 功能 | 参数 |
 |------|------|------|
-| `find_aidl_impl` | 分析 AIDL 接口（Stub/Proxy/注册） | interface_name, limit |
-| `trace_binder_chain` | 追踪 Binder IPC 调用链（Java→JNI→Native） | interface_name, method_name, limit |
+| `find_aidl_impl` | 分析 AIDL 接口 | interface_name, limit |
+| `trace_binder_chain` | 追踪 Binder 调用链 | interface_name, method_name, limit |
 
 #### System Service + JNI 工具 (3)
 
 | 工具 | 功能 | 参数 |
 |------|------|------|
-| `analyze_system_service` | 分析系统服务生命周期（启动/注册/使用） | service_name, limit |
-| `find_jni_bridge` | 查找 Java-Native 桥接（JNI 方法和实现） | java_class, limit |
-| `trace_permission` | 追踪权限检查路径（定义/检查/执行） | permission, limit |
+| `analyze_system_service` | 分析系统服务 | service_name, limit |
+| `find_jni_bridge` | 查找 JNI 桥接 | java_class, limit |
+| `trace_permission` | 追踪权限检查 | permission, limit |
+
+#### Advanced AOSP 工具 (6)
+
+| 工具 | 功能 | 参数 |
+|------|------|------|
+| `find_hal_interface` | 查找 HAL 接口 | hal_name, hal_type, limit |
+| `trace_broadcast` | 追踪广播流程 | action, limit |
+| `search_selinux_policy` | 搜索 SELinux 策略 | query, limit |
+| `find_resource_overlay` | 查找资源和 RRO | resource_name, limit |
+| `trace_init_service` | 追踪 Init 服务 | service_name, limit |
+| `analyze_build_module` | 分析构建模块 | module_name, limit |
 
 ### Token 优化
 
@@ -491,8 +502,10 @@ ps aux | grep opengrok
 - [x] Milestone 1: 基础框架 + 5 个基础工具
 - [x] Milestone 2: AIDL + Binder 分析工具
 - [x] Milestone 3: System Service + JNI 工具
-- [ ] Milestone 4-7: 其他 AOSP 专用工具
-- [ ] Milestone 8: 智能分析工具
+- [x] Milestone 4-7: Advanced AOSP 工具（HAL、Broadcast、SELinux、Resource、Init、Build）
+- [ ] Milestone 8: 智能分析工具（可选）
+
+**项目已完成核心功能，共 16 个工具！**
 
 ## 许可证
 
