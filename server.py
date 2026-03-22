@@ -6,7 +6,7 @@ from typing import Optional
 from mcp.server.fastmcp import FastMCP
 
 from core import OpenGrokClient, QueryCache, TokenOptimizer
-from tools import BasicTools, AidlBinderTools
+from tools import BasicTools, AidlBinderTools, SystemServiceJniTools
 
 
 # Load configuration
@@ -67,6 +67,7 @@ optimizer = TokenOptimizer(config)
 # Initialize tools
 basic_tools = BasicTools(client, cache, optimizer)
 aidl_binder_tools = AidlBinderTools(client, cache, optimizer)
+system_service_jni_tools = SystemServiceJniTools(client, cache, optimizer)
 
 
 # Register MCP tools
@@ -140,6 +141,34 @@ def trace_binder_chain(
 ):
     """Trace Binder IPC call chain (Java -> JNI -> Native)."""
     return aidl_binder_tools.trace_binder_chain(interface_name, method_name, limit)
+
+
+# System Service and JNI tools
+@mcp.tool()
+def analyze_system_service(
+    service_name: str,
+    limit: int = 10,
+):
+    """Analyze system service lifecycle (startup/registration/usage)."""
+    return system_service_jni_tools.analyze_system_service(service_name, limit)
+
+
+@mcp.tool()
+def find_jni_bridge(
+    java_class: str,
+    limit: int = 10,
+):
+    """Find Java-Native bridge (JNI methods and implementations)."""
+    return system_service_jni_tools.find_jni_bridge(java_class, limit)
+
+
+@mcp.tool()
+def trace_permission(
+    permission: str,
+    limit: int = 10,
+):
+    """Trace permission check path (definition/check/enforcement)."""
+    return system_service_jni_tools.trace_permission(permission, limit)
 
 
 if __name__ == "__main__":

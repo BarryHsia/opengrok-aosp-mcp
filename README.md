@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-### 7 个工具（Milestone 1 + 2）
+### 10 个工具（Milestone 1 + 2 + 3）
 
 #### 基础搜索工具 (5)
 
@@ -22,6 +22,14 @@
 |------|------|------|
 | `find_aidl_impl` | 分析 AIDL 接口（Stub/Proxy/注册） | interface_name, limit |
 | `trace_binder_chain` | 追踪 Binder IPC 调用链（Java→JNI→Native） | interface_name, method_name, limit |
+
+#### System Service + JNI 工具 (3)
+
+| 工具 | 功能 | 参数 |
+|------|------|------|
+| `analyze_system_service` | 分析系统服务生命周期（启动/注册/使用） | service_name, limit |
+| `find_jni_bridge` | 查找 Java-Native 桥接（JNI 方法和实现） | java_class, limit |
+| `trace_permission` | 追踪权限检查路径（定义/检查/执行） | permission, limit |
 
 ### Token 优化
 
@@ -268,6 +276,85 @@ Kiro: [调用 trace_binder_chain("IWindowManager", "addWindow")]
 }
 ```
 
+### 8. analyze_system_service - 分析系统服务
+
+**用途**：分析系统服务的完整生命周期（启动、注册、客户端使用）
+
+**参数**：
+- `service_name` (必需): 服务名，如 "activity", "power", "window"
+- `limit` (可选): 每个类型的最大结果数，默认 10
+
+**示例**：
+```
+User: 分析 ActivityManagerService
+Kiro: [调用 analyze_system_service("activity")]
+
+User: PowerManagerService 是如何启动的？
+Kiro: [调用 analyze_system_service("power")]
+```
+
+**返回格式**：
+```json
+{
+  "service_class": [...],    // 服务类定义
+  "registration": [...],     // 服务注册
+  "startup": [...],          // 启动逻辑
+  "client_usage": [...]      // 客户端使用
+}
+```
+
+### 9. find_jni_bridge - 查找 JNI 桥接
+
+**用途**：查找 Java 类的 Native 方法和 JNI 实现
+
+**参数**：
+- `java_class` (必需): Java 类全名，如 "android.os.Process"
+- `limit` (可选): 每个类型的最大结果数，默认 10
+
+**示例**：
+```
+User: android.os.Process 的 JNI 实现在哪里？
+Kiro: [调用 find_jni_bridge("android.os.Process")]
+
+User: 查找 Binder 的 native 方法
+Kiro: [调用 find_jni_bridge("android.os.Binder")]
+```
+
+**返回格式**：
+```json
+{
+  "java_native_methods": [...],  // Java 中的 native 方法声明
+  "jni_registration": [...],     // JNI 方法注册
+  "native_impl": [...]           // Native 实现
+}
+```
+
+### 10. trace_permission - 追踪权限检查
+
+**用途**：追踪权限的定义、检查点和强制执行
+
+**参数**：
+- `permission` (必需): 权限全名，如 "android.permission.CAMERA"
+- `limit` (可选): 每个类型的最大结果数，默认 10
+
+**示例**：
+```
+User: CAMERA 权限在哪里检查？
+Kiro: [调用 trace_permission("android.permission.CAMERA")]
+
+User: 追踪 WRITE_EXTERNAL_STORAGE 权限
+Kiro: [调用 trace_permission("android.permission.WRITE_EXTERNAL_STORAGE")]
+```
+
+**返回格式**：
+```json
+{
+  "permission_definition": [...],  // 权限定义
+  "check_points": [...],           // 检查点
+  "enforcement": [...]             // 强制执行
+}
+```
+
 ## 典型使用场景
 
 ### 场景 1：理解某个类的实现
@@ -325,6 +412,39 @@ Kiro 会：
 3. 帮助理解跨进程通信流程
 ```
 
+### 场景 6：分析系统服务
+
+```
+User: PowerManagerService 是如何工作的？
+
+Kiro 会：
+1. analyze_system_service("power")
+2. 查看服务启动、注册和客户端使用
+3. 理解系统服务架构
+```
+
+### 场景 7：查找 JNI 实现
+
+```
+User: android.os.Process 的 native 方法在哪里实现？
+
+Kiro 会：
+1. find_jni_bridge("android.os.Process")
+2. 展示 Java native 声明和 C++ 实现
+3. 理解 Java-Native 交互
+```
+
+### 场景 8：追踪权限检查
+
+```
+User: CAMERA 权限在哪里被检查？
+
+Kiro 会：
+1. trace_permission("android.permission.CAMERA")
+2. 找到权限定义、检查点和强制执行
+3. 理解权限机制
+```
+
 ## 项目结构
 
 ```
@@ -370,7 +490,7 @@ ps aux | grep opengrok
 
 - [x] Milestone 1: 基础框架 + 5 个基础工具
 - [x] Milestone 2: AIDL + Binder 分析工具
-- [ ] Milestone 3: System Service + JNI 工具
+- [x] Milestone 3: System Service + JNI 工具
 - [ ] Milestone 4-7: 其他 AOSP 专用工具
 - [ ] Milestone 8: 智能分析工具
 

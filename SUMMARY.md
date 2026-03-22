@@ -23,7 +23,7 @@ opengrok-aosp-mcp/
     └── basic.py           # 5 个基础工具
 ```
 
-## 🛠️ 7 个工具说明（Milestone 1 + 2）
+## 🛠️ 10 个工具说明（Milestone 1 + 2 + 3）
 
 ### 基础搜索工具 (5)
 
@@ -41,6 +41,14 @@ opengrok-aosp-mcp/
 |------|------|----------|----------|
 | `find_aidl_impl` | 分析 AIDL 接口 | interface_name | limit |
 | `trace_binder_chain` | 追踪 Binder 调用链 | interface_name, method_name | limit |
+
+### System Service + JNI 工具 (3)
+
+| 工具 | 功能 | 必需参数 | 可选参数 |
+|------|------|----------|----------|
+| `analyze_system_service` | 分析系统服务 | service_name | limit |
+| `find_jni_bridge` | 查找 JNI 桥接 | java_class | limit |
+| `trace_permission` | 追踪权限检查 | permission | limit |
 
 ## 🎯 Kiro 调用示例
 
@@ -93,6 +101,24 @@ Kiro: [调用 find_aidl_impl("IActivityManager")]
 ```
 User: 追踪 IActivityManager.startActivity 的调用链
 Kiro: [调用 trace_binder_chain("IActivityManager", "startActivity")]
+```
+
+### 8. analyze_system_service
+```
+User: 分析 PowerManagerService
+Kiro: [调用 analyze_system_service("power")]
+```
+
+### 9. find_jni_bridge
+```
+User: 查找 android.os.Process 的 JNI 实现
+Kiro: [调用 find_jni_bridge("android.os.Process")]
+```
+
+### 10. trace_permission
+```
+User: 追踪 CAMERA 权限检查
+Kiro: [调用 trace_permission("android.permission.CAMERA")]
 ```
 
 ## 📊 返回格式
@@ -164,7 +190,7 @@ kiro-cli chat
 
 - [x] Milestone 1: 基础框架 + 5 个基础工具
 - [x] Milestone 2: AIDL + Binder 分析工具
-- [ ] Milestone 3: System Service + JNI 工具
+- [x] Milestone 3: System Service + JNI 工具
 - [ ] Milestone 4-7: 其他 AOSP 专用工具
 - [ ] Milestone 8: 智能分析工具
 
