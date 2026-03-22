@@ -1,0 +1,26 @@
+{
+  "opengrok": {
+    "base_url": "http://localhost:8080/source",
+    "token": "your-token-here"
+  },
+  "cache": {
+    "enabled": true,
+    "ttl_hours": 24,
+    "directory": ".cache"
+  },
+  "limits": {
+    "default_results": 10,
+    "max_results": 50,
+    "max_snippet_lines": 5
+  },
+  "token_optimization": {
+    "abbreviate_paths": true,
+    "path_prefixes": {
+      "frameworks/base": "f/b",
+      "frameworks/native": "f/n",
+      "system/core": "s/c",
+      "hardware/interfaces": "h/i",
+      "packages/apps": "p/a"
+    }
+  }
+}
